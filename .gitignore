@@ -4,3 +4,4 @@ populate-database.py
 read-database.py
 test-file.py
 __pycache__
+.DS_Store
