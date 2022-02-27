@@ -1,0 +1,6 @@
+python-telegram-bot==12.7
+datetime
+pytz
+redis
+python-yr
+psycopg2-binary
