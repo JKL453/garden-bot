@@ -3,4 +3,5 @@ datetime
 pytz
 redis
 python-yr
+postgresql
 psycopg2-binary
