@@ -1,16 +1,4 @@
-"""from telegram import Location
-
-import datetime, pytz
-from modules import WeatherReport as wr
-from config import MY_LOCATION
-
-# Specify timezone and create a datetime object
-my_timezone = pytz.timezone("Europe/Berlin")
-my_date = datetime.datetime.now(my_timezone)
-
-weather_report = wr.WeatherReport(location = MY_LOCATION, date= my_date)"""
-
-from modules.YrUtils import WeatherReport as wr
+from modules.YrUtils import WeatherReport
 import datetime, pytz
 import json
 
@@ -21,6 +9,8 @@ alt = 162
 location = [lat, lon, alt]
 date = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
 
-weather_report = wr(location=location, date=date)
+weather_report = WeatherReport(location=location, date=date)
 forecast = weather_report.get_forecast()
+
+# print prettified json forecast
 print(json.dumps(forecast, indent=4))
