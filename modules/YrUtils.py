@@ -1,6 +1,7 @@
 from modules.config import UA_SITENAME
 import requests
 import json
+import datetime, pytz
 
 class WeatherReport(object):
     """
@@ -20,7 +21,7 @@ class WeatherReport(object):
         self.date = date
 
 
-    def get_forecast(self) -> dict:
+    def get_weather_data(self) -> json:
         """
         Returns the forecast data as a dictionary.
         """
@@ -42,45 +43,27 @@ class WeatherReport(object):
         response = requests.get(self.api_url, headers=self.headers)
 
         # convert response to JSON
-        forecast_data_json = json.loads(response.text)
-        #print(json.dumps(response_json, indent=4))
+        response_json = json.loads(response.text)
+        weather_data = json.dumps(response_json, indent=4)
 
-        return forecast_data_json
+        return weather_data
+
+
+    def get_weather_from_time(self.weather_data, datetime_object):
+        """
+        Get weather data for a certain period of time
+        :param string time: time of weather forecast
+        :return: weather data
+        """
+        time_string = datetime.datetime.strftime(datetime_object, '%Y-%m-%dT%H:00:00Z')
+        print(time_string)
+
+        for item in self.response_json['properties']['timeseries']:
+            if item['time'] == time_string:
+                return json.dumps(item['data'], indent=4)
         
 
     # To be implemented:
     # def get_forecast_for_day(self, today):
 
     # https://developer.yr.no/doc/ForecastJSON/
-
-
-    """def get_forecast(self):
-        self.forecast_data['data'] = [{ 'from': forecast['@from'], 
-                                        'to': forecast['@to'], 
-                                        'temperature': float(forecast['temperature']['@value']), 
-                                        'rain': float(forecast['precipitation']['@value'])} 
-                             for forecast in self.weather_data.forecast()]
-
-        return self.forecast_data"""
-
-    """def get_temperature(self):
-        return self.weather.temperature
-
-    def get_wind(self):
-        return self.weather.wind_speed
-
-    def get_humidity(self):
-        return self.weather.humidity
-
-    def get_pressure(self):
-        return self.weather.pressure
-
-    def get_sunrise(self):
-        return self.weather.sunrise
-
-    def get_sunset(self):
-        return self.weather.sunset
-
-    def get_forecast(self):
-        return self.weather.forecast
-"""
