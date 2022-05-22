@@ -44,12 +44,12 @@ class WeatherReport(object):
 
         # convert response to JSON
         response_json = json.loads(response.text)
-        weather_data = json.dumps(response_json, indent=4)
+        self.weather_data = json.dumps(response_json, indent=4)
 
-        return weather_data
+        return self.weather_data
 
 
-    def get_weather_from_time(self.weather_data, datetime_object):
+    def get_weather_from_time(self, datetime_object):
         """
         Get weather data for a certain period of time
         :param string time: time of weather forecast
@@ -67,3 +67,8 @@ class WeatherReport(object):
     # def get_forecast_for_day(self, today):
 
     # https://developer.yr.no/doc/ForecastJSON/
+
+    # weather_report = WeatherReport(location=location, date=date)
+    # forecast = weather_report.get_forecast(time=time)
+    # weather_symbol = forecast.get_weather_symbol()
+    
