@@ -10,7 +10,13 @@ location = [lat, lon, alt]
 date = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
 
 weather_report = WeatherReport(location=location, date=date)
-forecast = weather_report.get_forecast()
+forecast = weather_report.get_weather_data()
 
 # print prettified json forecast
-print(json.dumps(forecast, indent=4))
+#print(json.dumps(forecast, indent=4))
+
+weather_now = weather_report.get_weather_from_time(date)
+print("")
+print(date)
+print("")
+print(weather_now)

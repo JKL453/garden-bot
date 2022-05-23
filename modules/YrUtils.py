@@ -43,8 +43,8 @@ class WeatherReport(object):
         response = requests.get(self.api_url, headers=self.headers)
 
         # convert response to JSON
-        response_json = json.loads(response.text)
-        self.weather_data = json.dumps(response_json, indent=4)
+        self.response_json = json.loads(response.text)
+        self.weather_data = json.dumps(self.response_json, indent=4)
 
         return self.weather_data
 
@@ -64,7 +64,7 @@ class WeatherReport(object):
         
 
     # To be implemented:
-    # def get_forecast_for_day(self, today):
+    # def get_forecast_for_day(self, today):,
 
     # https://developer.yr.no/doc/ForecastJSON/
 
