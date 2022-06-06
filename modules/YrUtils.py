@@ -27,7 +27,7 @@ class WeatherReport(object):
         """
         
         # create forecast URL for given location
-        self.base_url = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?'
+        self.base_url = 'https://api.met.no/weatherapi/locationforecast/2.0/complete?'
         self.api_url = '{base_url}lat={lat}&lon={lon}&altitude={alt}'.format(
             base_url=self.base_url,
             lat=self.lat,
@@ -49,7 +49,7 @@ class WeatherReport(object):
         return self.weather_data
 
 
-    def get_weather_from_time(self, datetime_object):
+    def get_weather_from_time(self, datetime_object, return_repr='json'):
         """
         Get weather data for a certain period of time
         :param string time: time of weather forecast
@@ -60,8 +60,23 @@ class WeatherReport(object):
 
         for item in self.response_json['properties']['timeseries']:
             if item['time'] == time_string:
-                return json.dumps(item['data'], indent=4)
+                if return_repr == 'str':
+                    # this returns a prettified string
+                    return json.dumps(item['data'], indent=4)
+                if return_repr == 'json':
+                    # this returns a dictionary
+                    return item['data']
         
+    def get_next_dates():
+        """
+        Get datetime objects for tomorrow and day after tomorrow
+        :return: (datetime object, datetime object)
+        """
+        dt = datetime.datetime.now(pytz.timezone("Europe/Berlin")) + datetime.timedelta(days=1)
+        date_tomorrow = dt.replace(hour=6, minute=0)
+        dat= datetime.datetime.now(pytz.timezone("Europe/Berlin")) + datetime.timedelta(days=2)
+        date_after_tomorrow = dat.replace(hour=6, minute=0)
+        return date_tomorrow, date_after_tomorrow
 
     # To be implemented:
     # def get_forecast_for_day(self, today):,
