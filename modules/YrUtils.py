@@ -56,7 +56,7 @@ class WeatherReport(object):
         :return: weather data
         """
         time_string = datetime.datetime.strftime(datetime_object, '%Y-%m-%dT%H:00:00Z')
-        print(time_string)
+        #print(time_string)
 
         for item in self.response_json['properties']['timeseries']:
             if item['time'] == time_string:
