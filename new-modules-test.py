@@ -39,7 +39,7 @@ weather_tomorrow = weather_report.get_weather_from_time(date_tomorrow, return_re
 weather_after_tomorrow = weather_report.get_weather_from_time(date_after_tomorrow, return_repr='str')
 #print(weather_after_tomorrow)
 
-def create_daily_forecast(date):
+def create_daily_forecast(date) -> str:
     """
     Create a weather message for a certain time period
     :param datetime date: datetime object
@@ -75,8 +75,6 @@ def create_daily_forecast(date):
     rain_prob_06 = weather_data_06['next_6_hours']['details']['probability_of_precipitation']
     rain_prob_12 = weather_data_12['next_6_hours']['details']['probability_of_precipitation']
     rain_prob_18 = weather_data_18['next_6_hours']['details']['probability_of_precipitation']
-
-    uv_index_06 = weather_data_06_uv['instant']['details']['ultraviolet_index_clear_sky']
 
     uv_data = get_uv_data(date)
 
@@ -114,7 +112,7 @@ def create_daily_forecast(date):
  
     return weather_msg
 
-def get_uv_data(date):
+def get_uv_data(date) -> list:
     """
     Get UV-Index for a given date
     :param datetime date: datetime object
