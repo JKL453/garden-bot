@@ -29,6 +29,11 @@ print('\n\n')
 # add args for length of prediction period
 # weather_next_hour = weather_report.get_weather_from_time(date=date, prediction_period=1)
 
+# get date for today
+
+date = dt.now(pytz.timezone("Europe/Berlin"))
+date_today  = date.replace(hour=6, minute=0)
+
 # get dates for tomorrow and day after tomorrow
 date_tomorrow, date_after_tomorrow = WeatherReport.get_next_dates()
 #print(str(tomorrow_date) + ' and ' + str(day_after_tomorrow_date))
@@ -68,13 +73,25 @@ def create_daily_forecast(date) -> str:
     temp_min_18 = int(weather_data_18['next_6_hours']['details']['air_temperature_min'])
     temp_max_18 = int(weather_data_18['next_6_hours']['details']['air_temperature_max'])
 
-    rain_mm_06 = weather_data_06['next_6_hours']['details']['precipitation_amount']
-    rain_mm_12 = weather_data_12['next_6_hours']['details']['precipitation_amount']
-    rain_mm_18 = weather_data_18['next_6_hours']['details']['precipitation_amount']
+    rain_min_mm_06 = weather_data_06['next_6_hours']['details']['precipitation_amount_min']
+    rain_max_mm_06 = weather_data_06['next_6_hours']['details']['precipitation_amount_max']
+    rain_min_mm_12 = weather_data_12['next_6_hours']['details']['precipitation_amount_min']
+    rain_max_mm_12 = weather_data_12['next_6_hours']['details']['precipitation_amount_max']
+    rain_min_mm_18 = weather_data_18['next_6_hours']['details']['precipitation_amount_min']
+    rain_max_mm_18 = weather_data_18['next_6_hours']['details']['precipitation_amount_max']
 
     rain_prob_06 = weather_data_06['next_6_hours']['details']['probability_of_precipitation']
     rain_prob_12 = weather_data_12['next_6_hours']['details']['probability_of_precipitation']
     rain_prob_18 = weather_data_18['next_6_hours']['details']['probability_of_precipitation']
+
+    yr_symbol_code_06 = weather_data_06['next_6_hours']['summary']['symbol_code']
+    weather_symbol_06 = weather_report.get_uni_code(yr_symbol_code_06)
+
+    yr_symbol_code_12 = weather_data_12['next_6_hours']['summary']['symbol_code']
+    weather_symbol_12 = weather_report.get_uni_code(yr_symbol_code_12)
+
+    yr_symbol_code_18 = weather_data_18['next_6_hours']['summary']['symbol_code']
+    weather_symbol_18 = weather_report.get_uni_code(yr_symbol_code_18)
 
     uv_data = get_uv_data(date)
 
@@ -83,29 +100,29 @@ def create_daily_forecast(date) -> str:
     weather_msg += ', den ' + str(date.day) + '.' + str(date.month) + '.' + str(date.year) + ': \n\n'
 
     
-    weather_msg += '06 bis 12 Uhr' + '\n'
+    weather_msg += '06 bis 12 Uhr' + '   ' + weather_symbol_06 + '\n'
     #weather_msg += 'Temperatur      Niederschlag' + '\n'
     weather_msg += '{}°C - {}°C'.format(temp_min_06, temp_max_06)
     weather_msg += '     '
-    weather_msg += '{} mm ({}%)'.format(rain_mm_06, rain_prob_06)
+    weather_msg += '{} mm - {} mm ({}%)'.format(rain_min_mm_06, rain_max_mm_06, rain_prob_06)
     weather_msg += '     '
     weather_msg += 'UV max: {}'.format(uv_data[1])
     weather_msg += '\n\n'
 
-    weather_msg += '12 bis 18 Uhr' + '\n'
+    weather_msg += '12 bis 18 Uhr' + '   ' + weather_symbol_12 + '\n'
     #weather_msg += 'Temperatur      Niederschlag' + '\n'
     weather_msg += '{}°C - {}°C'.format(temp_min_12, temp_max_12)
     weather_msg += '     '
-    weather_msg += '{} mm ({}%)'.format(rain_mm_12, rain_prob_12)
+    weather_msg += '{} mm - {} mm ({}%)'.format(rain_min_mm_12, rain_max_mm_12, rain_prob_12)
     weather_msg += '     '
     weather_msg += 'UV max: {}'.format(uv_data[3])
     weather_msg += '\n\n'
 
-    weather_msg += '18 bis 24 Uhr' + '\n'
+    weather_msg += '18 bis 24 Uhr' + '   ' + weather_symbol_18 + '\n'
     #weather_msg += 'Temperatur      Niederschlag' + '\n'
     weather_msg += '{}°C - {}°C'.format(temp_min_18, temp_max_18)
     weather_msg += '     '
-    weather_msg += '{} mm ({}%)'.format(rain_mm_18, rain_prob_18)
+    weather_msg += '{} mm - {} mm ({}%)'.format(rain_min_mm_18, rain_max_mm_18, rain_prob_18)
     weather_msg += '     '
     weather_msg += 'UV max: {}'.format(uv_data[5])
     weather_msg += '\n\n'
