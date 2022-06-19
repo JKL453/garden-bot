@@ -1,5 +1,7 @@
 from time import strftime
 from modules.YrUtils import WeatherReport
+from modules.dbUtils import BotDatabase
+from telegram import Update
 from datetime import datetime as dt 
 import pytz
 import json
@@ -45,3 +47,6 @@ weather_after_tomorrow = weather_report.weather_from_time(date_after_tomorrow, r
 
 weather_msg = weather_report.daily_forecast(date_tomorrow)
 print(weather_msg)
+
+bot_db = BotDatabase()
+bot_db.test_connection()
