@@ -50,3 +50,18 @@ print(weather_msg)
 
 bot_db = BotDatabase()
 bot_db.test_connection()
+
+users= bot_db.get_all_users()
+
+print(str(users))
+
+"""
+Dem table users können noch Spalten für folgende Daten hinzugefuegt werden:
+    * last_watering_date
+    * next_watering_date
+Diese werden immer an dem Tag aktualisiert, an dem die Perso mit gießen an der Reihe ist.
+
+Außerdem sollte dem table users ein Feld hinzugefuegt werden, in dem der Zeitpunkt der Benachrichtigung
+gespeichert wird. Dieser wird dann abgefragt, sobald der Scheduler triggert. Wenn dort schon eine datetime
+des aktuellen Tages eingetragen ist, dann sendet der Bot nicht erneut den daily reminder.
+"""

@@ -11,6 +11,8 @@ from telegram.ext import (
     Filters,
     CallbackContext
 )
+from modules.YrUtils import WeatherReport
+from modules.dbUtils import BotDatabase
 
 # Check if garden-bot is run locally or on heroku
 # If run locally import config vars form config file
@@ -23,7 +25,8 @@ else:
         WEBHOOK_URL,
         MY_CHAT_ID,
         MY_LOCATION,
-        DATABASE_URL
+        DATABASE_URL,
+        UA_SITENAME
     )
 
 # Import config variables
@@ -39,9 +42,18 @@ if debug == False:
 my_timezone = pytz.timezone("Europe/Berlin")
 my_date = datetime.datetime.now(my_timezone)
 
-# Connect to your postgres DB
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+time_now = datetime.datetime.now(pytz.timezone("Europe/Berlin"))
+date_today  = time_now.replace(hour=6, minute=0)
 
+wr = WeatherReport(location=MY_LOCATION, date=time_now)
+
+date_tomorrow, date_after_tomorrow = WeatherReport.get_next_dates()
+
+# Connect to your postgres DB (deprecated)
+#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+# Initialize database object and connect to BotDatabase 
+db = BotDatabase()
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -61,7 +73,7 @@ def start(update: Update, context: CallbackContext):
     """Send a message when the command /start is issued."""
     
     # Get users list from database
-    users = read_database(conn)
+    users = db.get_all_users()
     
     # At first, check if user is already in database
     # Get chat_ids from database
@@ -122,7 +134,7 @@ def ask_name(update: Update, context: CallbackContext):
 def verify_name(update: Update, context: CallbackContext):
     
     entered_name = update.message.text
-    users = read_database(conn)
+    users = db.get_all_users()
     
     context.user_data['name'] = entered_name
     context.user_data['chat_id'] = update.message.chat_id
@@ -163,7 +175,7 @@ def verify_name(update: Update, context: CallbackContext):
     
 def get_name(update: Update, context: CallbackContext):
     name = update.message.text
-    users = read_database(conn)
+    users = db.get_all_users()
     
     context.user_data['name'] = name
     context.user_data['chat_id'] = update.message.chat_id
@@ -213,7 +225,7 @@ def register_user(update: Update, context: CallbackContext):
     user_name = context.user_data['name']
     user_chat_id = context.user_data['chat_id']
     
-    write_database(conn, user_name, user_chat_id)
+    db.write_database(user_name, user_chat_id)
     
     reply_keyboard = [
             ['Hilfe', 'Wetterbericht'], # keyboard needs to be removed or is always shown
@@ -240,14 +252,14 @@ def done(update: Update, context: CallbackContext):
     
     return ConversationHandler.END
     
-def set_name(update, context):
+def set_name(update: Update, context: CallbackContext):
     """Send a message when the command /help is issued."""
     update.message.reply_text(
         'Hallo ' 
         + update.message.text
     ) 
     
-def help(update, context):
+def help(update: Update, context: CallbackContext):
     """Send a message when the command /help is issued."""
     update.message.reply_text(
         "Wenn du registriert bist, sende ich dir jeden morgen um 10:00 Uhr "
@@ -260,6 +272,28 @@ def help(update, context):
     )
     
     return ConversationHandler.END
+
+def send_forecast(update: Update, context: CallbackContext): 
+    """Send a message when the command /forecast is issued."""
+    # Send forecast
+    
+    forecast = wr.get_weather_data()
+
+    weather_tomorrow = wr.weather_from_time(date_tomorrow, return_repr='str')
+    
+    weather_msg = wr.daily_forecast(date_tomorrow)
+    #print(weather_msg)
+
+    """
+    forecast = get_forecast()
+    bot.send_message(
+        chat_id=chat_id,
+        text=forecast
+    )
+    """
+    update.message.reply_text(
+        text=weather_msg
+    )  
 
 # ------------------------------- #
 #    Conversation Handler End     #   
@@ -308,12 +342,12 @@ def main():
     # on different commands - answer in Telegram
     #dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("forecast", forecast))
-    dp.add_handler(CommandHandler("db_test", db_test))
+    dp.add_handler(CommandHandler("forecast", send_forecast))
+    #dp.add_handler(CommandHandler("db_test", db_test))
     dp.add_handler(conv_handler)
 
-    users = read_database(conn)
-    watering_user_id = get_water_person(conn)
+    users = db.get_all_users()
+    watering_user_id = db.get_water_person()
     for user in users:
         if user[0] == watering_user_id:
             watering_user_name = user[2]
@@ -329,7 +363,7 @@ def main():
             + str(my_date.today().day) + "\." 
             + str(my_date.today().month) + "\." 
             + str(my_date.today().year) + ":\n \n"
-            + get_forecast() + "\n \n"
+            + send_forecast() + "\n \n"
             "Wasserdienst heute: {}".format(watering_user_name)
         )
         
